@@ -1,4 +1,4 @@
-package edu.escuelaing.WebApp;
+package co.edu.eci;
 
 import java.net.*;
 import java.io.*;
