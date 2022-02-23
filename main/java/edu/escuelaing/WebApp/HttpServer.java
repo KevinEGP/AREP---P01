@@ -29,19 +29,12 @@ public class HttpServer {
 
 			String s;
 			while ((s = in.readLine()) != null) {
-				System.out.println(s);
+				// System.out.println(s);
 
-				if (s.contains("GET")){
-					System.out.println("Petición GET");
+				if (s.contains("Referer")) {
+					System.out.println(s);
 					String path = s.split(" ")[1];
-					path = path.replace("/", "");
-					try {
-						path = path.split("=")[1];
-					} catch(Exception e) {
-						// e.printStackTrace();
-					}
-					
-					getClima(path.replace("/", ""));
+					getClima(path);
 				}
 				if (s.isEmpty()) {
 					break;
@@ -94,7 +87,7 @@ public class HttpServer {
 
         } catch (IOException x) {
 
-            System.err.println(x);
+            // System.err.println(x);
         }
 
 		return "";
