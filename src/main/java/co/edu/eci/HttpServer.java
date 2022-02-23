@@ -2,6 +2,7 @@ package edu.escuelaing.WebApp;
 
 import java.net.*;
 import java.io.*;
+import org.json.*;
 
 public class HttpServer {
 
@@ -26,7 +27,7 @@ public class HttpServer {
 			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
 
-
+			String salida = "<P>No se pudo encontrar</P>";
 			String s;
 			while ((s = in.readLine()) != null) {
 				// System.out.println(s);
@@ -38,7 +39,7 @@ public class HttpServer {
 					if (url.getPath().equals("/consulta")) {
 						String[] params = url.getQuery().split("&");
 						String city = params[0].split("=")[1];
-						getWeather(city);
+						salida = getWeather(city);
 					}			
 				}
 				if (s.isEmpty()) {
@@ -50,7 +51,7 @@ public class HttpServer {
 						"Content-Type: text/html\r\n" +
 						"\r\n" +
 						"<TITLE>Clima</TITLE>" +
-						"<P>Salida</P>"
+						salida
 			);
 
 
