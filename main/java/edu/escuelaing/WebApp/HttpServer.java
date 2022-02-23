@@ -20,7 +20,7 @@ public class HttpServer {
 
 		while (true) {
 			Socket clientSocket = serverSocket.accept();
-			System.out.println("Nueva petición recibida");
+			// System.out.println("Nueva petición recibida");
 
 
 			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -32,28 +32,29 @@ public class HttpServer {
 				// System.out.println(s);
 
 				if (s.contains("Referer")) {
-					System.out.println(s);
 					String path = s.split(" ")[1];
-					getClima(path);
+					URL url = new URL(path);
+
+					if (url.getPath().equals("/consulta")) {
+						String[] params = url.getQuery().split("&");
+						String city = params[0].split("=")[1];
+						getWeather(city);
+					}			
 				}
 				if (s.isEmpty()) {
 					break;
 				}
 			}
 
-			out.write("HTTP/1.0 200 OK\r\n");
-			out.write("Content-Type: text/html\r\n");
-			// out.write("Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n");
-			// out.write("Server: Apache/0.8.4\r\n");
-			// out.write("Content-Length: 59\r\n");
-			// out.write("Expires: Sat, 01 Jan 2000 00:59:59 GMT\r\n");
-			// out.write("Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n");
-			out.write("\r\n");
-			out.write("<TITLE>Clima</TITLE>");
-			out.write("<P>Salida</P>");
+			out.write(	"HTTP/1.0 200 OK\r\n" +
+						"Content-Type: text/html\r\n" +
+						"\r\n" +
+						"<TITLE>Clima</TITLE>" +
+						"<P>Salida</P>"
+			);
 
 
-			System.out.println("Petición terminada");
+			// System.out.println("Petición terminada");
 			out.close();
 			in.close();
 			clientSocket.close();
@@ -62,18 +63,11 @@ public class HttpServer {
 	// serverSocket.close();
 	}
 
-	static private String getClima(String path) throws Exception {
+	static private String getWeather(String city) throws Exception {
 
 		final String KEY = "8f7be5f45471c12644241ab5a22f7d32";
 		
-        URL myUrl;
-		try {
-			myUrl = new URL("https://api.openweathermap.org/data/2.5/weather?id=" + path + "&appid=");
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-			throw new Exception("Url Incorrecta");
-
-		}
+		URL myUrl = new URL("https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + KEY);
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(myUrl.openStream()))) {
 
@@ -81,15 +75,13 @@ public class HttpServer {
 
             while ((inputLine = reader.readLine()) != null) {
 
-                // System.out.println(inputLine);
-
+                System.out.println(inputLine);
             }            
 
         } catch (IOException x) {
 
-            // System.err.println(x);
+            System.err.println(x);
         }
-
 		return "";
 	}
 
