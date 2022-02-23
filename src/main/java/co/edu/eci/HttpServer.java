@@ -23,39 +23,63 @@ public class HttpServer {
 			Socket clientSocket = serverSocket.accept();
 			// System.out.println("Nueva petición recibida");
 
-
 			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
 
-			String salida = "<P>No se pudo encontrar</P>";
+			String weather = "";
 			String s;
 			while ((s = in.readLine()) != null) {
-				// System.out.println(s);
+				System.out.println(s);
 
-				if (s.contains("Referer")) {
-					String path = s.split(" ")[1];
-					URL url = new URL(path);
-
-					if (url.getPath().equals("/consulta")) {
-						String[] params = url.getQuery().split("&");
-						String city = params[0].split("=")[1];
-						salida = getWeather(city);
-					}			
-				}
 				if (s.isEmpty()) {
 					break;
 				}
+
+				if (s.contains("GET") && s.contains("HTTP")) {
+					String query = s.split(" ")[1];
+					String path = "";
+					String params = "";
+					try {
+						path = query.split("\\?")[0];
+						params = query.split("\\?")[1];
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+					if (path.equals("/consulta")) {
+						String[] paramsArray;
+						String city = "";
+						try {
+							paramsArray = params.split("&");
+							city = paramsArray[0].split("=")[1];							
+							weather = getWeather(city);
+							break;
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						System.out.println(weather);
+					}
+				}
+				
 			}
+
+
+			// System.out.println("Salida__________________");
+
+			// System.out.println(weather);
+
+			
 
 			out.write(	"HTTP/1.0 200 OK\r\n" +
 						"Content-Type: text/html\r\n" +
 						"\r\n" +
 						"<TITLE>Clima</TITLE>" +
-						salida
+						"<p>"+ weather + "</p>" +
+						"<p>Fin</p>" 
 			);
 
 
-			// System.out.println("Petición terminada");
+			System.out.println("Petición terminada");
 			out.close();
 			in.close();
 			clientSocket.close();
@@ -70,20 +94,24 @@ public class HttpServer {
 		
 		URL myUrl = new URL("https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + KEY);
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(myUrl.openStream()))) {
+		String stringResponse = "";
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(myUrl.openStream()))) {
 
-            String inputLine = null;
+			String inputLine = null;
 
-            while ((inputLine = reader.readLine()) != null) {
+			while ((inputLine = reader.readLine()) != null) {
+				stringResponse += inputLine;
+			}            
 
-                System.out.println(inputLine);
-            }            
+		} catch (IOException x) {
 
-        } catch (IOException x) {
+			System.err.println(stringResponse);
+		}
 
-            System.err.println(x);
-        }
-		return "";
+		// System.out.println(stringResponse);
+		JSONObject jsonResponse = new JSONObject(stringResponse).getJSONArray("weather").getJSONObject(0);
+		// System.out.println( jsonResponse.getJSONObject("description"));
+		return jsonResponse.getString("main") + " - " + jsonResponse.getString("description");
 	}
 
 }
