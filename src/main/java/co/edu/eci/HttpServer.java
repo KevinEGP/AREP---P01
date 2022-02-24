@@ -53,7 +53,7 @@ public class HttpServer {
 						}
 					}
 					
-					if (path.equals("/clima")) {
+					if (path.equals("/clima") || path.equals("/")) {
 						response = getIndex();
 					}
 					
@@ -151,7 +151,7 @@ public class HttpServer {
 										"<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js\"></script>" +
 										"<script type=\"text/javascript\">" +
 										"function search() {" +
-										"let endpoint = `http://localhost:35000/consulta?lugar=`;" +
+										"let endpoint = `https://app-weather-cities.herokuapp.com/consulta?lugar=`;" +
 										"let city =  $(`#city`).val();" +
 										"$(`#city`).text();" +
 										"$.ajax({" +
