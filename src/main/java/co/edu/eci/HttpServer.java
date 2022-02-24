@@ -14,7 +14,7 @@ public class HttpServer {
 
 		ServerSocket serverSocket = null;
 		try { 
-				serverSocket = new ServerSocket(PORT);
+				serverSocket = new ServerSocket(getPort());
 
 		} catch (IOException e) {
 
@@ -130,6 +130,13 @@ public class HttpServer {
 		// System.out.println( jsonResponse.getJSONObject("description"));
 		return jsonResponse.getString("main") + " - " + jsonResponse.getString("description");
 	}
+
+	private static int getPort() {
+		if (System.getenv("PORT") != null) {
+		return Integer.parseInt(System.getenv("PORT"));
+		}
+		return PORT;
+}
 
 	private static String getIndex() {
 		String view = 	"<!DOCTYPE html>" +
